@@ -1,10 +1,19 @@
+/** Based on Analog Devices AD7142 datasheet rev. B https://www.analog.com/media/en/technical-documentation/data-sheets/AD7142.pdf
+* Started 28/01/2022 by Remko Proesmans
+* Code structure analogous to https://github.com/disk91/LIS2DH
+* Maintained at https://github.com/RemkoPr/AD7142_Arduino
+* Changelog:
+*     ... - ongoing development release
+* NOTE: THIS IS ONLY A PARIAL RELEASE. 
+*/
+
 #ifndef _AD7142_H_
 #define _AD7142_H_
 
 
 #define AD7142_I2C_BASE_ADDRESS           0x02C // 0101 100
 
-// set the profile (AD7142_PROFILE) to determine which settings are used form settings.h
+// set the profile (AD7142_PROFILE) to determine which settings are used from settings.h
 #define AD7142_PROFILE_5X5                0
 #define AD7142_PROFILE_SINGLE             1
 #define AD7142_PROFILE_DEBUG              2
@@ -98,7 +107,7 @@
 #define AD7142_STAGE0_MIN_AVG             0x100
 #define AD7142_STAGE0_LOW_THRESHOLD       0x101
 #define AD7142_STAGE0_MIN_TEMP            0x102
-// 0x103 unused
+                                       // 0x103 unused
 #define AD7142_STAGEX_BANK3_ADDR_OFFSET   0x024 
 
 // ***********
@@ -151,11 +160,23 @@
 #define AD7142_AVG_LP_SKIP_3              0x11
 
 // AMB_COMP_CTRL0 bit options, datasheet Table 22
-  // TODO
+#define AD7142_FF_SKIP_CNT_MAX			  12
+#define AD7142_FP_PROXIMITY_CNT_MAX		  15
+#define AD7142_LP_PROXIMITY_CNT_MAX		  15
+#define AD7142_PWR_DOWN_TIMEOUT_MAX		  2
+#define AD7142_FORCED_CAL_FALSE		  	  0x00
+#define AD7142_FORCED_CAL_TRUE		  	  0x01
+#define AD7142_CONV_RESET_FALSE			  0x00
+#define AD7142_CONV_RESET_TRUE			  0x01
+
 // AMB_COMP_CTRL1 bit options, datasheet Table 23
-  // TODO
+#define AD7142_PROXIMITY_RECAL_LVL_MAX		  255
+#define AD7142_PROXIMITY_DETECTION_RATE_MAX	  63
+#define AD7142_SLOW_FILTER_UPDATE_LVL_MAX  	  3
+
 // AMB_COMP_CTRL2 bit options, datasheet Table 24
-  // TODO
+#define AD7142_FP_PROXIMITY_RECAL_MAX	  1023
+#define AD7142_LP_PROXIMITY_RECAL_MAX	  63
 
 // STAGE_LOW_INT_EN bit options, datasheet Table 25
 #define AD7142_STAGEX_LOW_INT_DISABLE     0x00
@@ -311,7 +332,7 @@ class AD7142 {
 #endif
 
 #if AD7142_LOG_LEVEL >= 1
-#define AD7142_LOG_ANY(x) Serial.println(x)
+#define AD7142_LOG_ANY(x) Serial.print(x)
 #else
 #define AD7142_LOG_ANY(x) // nothing
 #endif

@@ -1,3 +1,12 @@
+/** Based on Analog Devices AD7142 datasheet rev. B https://www.analog.com/media/en/technical-documentation/data-sheets/AD7142.pdf
+* Started 28/01/2022 by Remko Proesmans
+* Code structure analogous to https://github.com/disk91/LIS2DH
+* Maintained at https://github.com/RemkoPr/AD7142_Arduino
+* Changelog:
+*     ... - ongoing development release
+* NOTE: THIS IS ONLY A PARIAL RELEASE. 
+*/
+
 #include "Arduino.h"
 #include "stdint.h"
 #include "ad7142.h"
@@ -12,11 +21,12 @@ AD7142::AD7142( uint8_t add0, uint8_t add1 ) {
   } else {
     _address = AD7142_I2C_BASE_ADDRESS + (add1<<1) + add0;
   }
-  _resultsRaw = new uint16_t[12]; // raw results register contents
-  _resultsPf = new float[12]; // results in pF
+  _resultsRaw = new uint16_t[12];  // raw results register contents
+  _resultsPf = new float[12];      // results in pF
 }
 AD7142::~AD7142() {
   delete[] _resultsRaw;
+  delete[] _resultsPf;
 }
 bool AD7142::init() {
   Wire.begin(); 
@@ -143,6 +153,14 @@ bool AD7142::setCdcBiasCurrentControl(uint8_t ctrl) {
   uint16_t pwr_control_reg = readRegister(AD7142_PWR_CONTROL);
   pwr_control_reg = (pwr_control_reg & 0b0011111111111111) | (ctrl<<14);
   return writeRegister(AD7142_PWR_CONTROL, pwr_control_reg);
+}
+
+// *************************************
+//   Environmental calibration control
+// *************************************
+
+bool AD7142::resetConversionSequence() {
+  return writeRegisterBits(AD7142_AMB_COMP_CTRL0, 15, 15, AD7142_CONV_RESET_TRUE);
 }
 
 // ************************
