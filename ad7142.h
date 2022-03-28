@@ -272,6 +272,9 @@ class AD7142 {
     bool setInvSrcControl(uint8_t ctrl);
     bool setCdcBiasCurrentControl(uint8_t ctrl);
 
+	// Environmental calibration control
+	bool resetConversionSequence();
+
     // Interrupt control
     bool setInterrupt(uint8_t interruptCtrl[12][3]);
     
