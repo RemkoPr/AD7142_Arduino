@@ -1,3 +1,7 @@
+/**
+* The settings here are entirely application-specific, adjust to your needs. The settings "profile" is defined in ad7142.h and determines which collection of settings is used.
+**/
+
 #ifndef _AD7142_SETTINGS_H_
 #define _AD7142_SETTINGS_H_
 
@@ -19,7 +23,7 @@ uint8_t _pwrCtrl[8] =
   
 uint8_t _interruptCtrl[12][3] = 
   {
-    //        STAGE0_LOW_INT_EN               STAGE_HIGH_INT_EN               STAGE_COMPLETE_INT_EN
+    //        STAGE_LOW_INT_EN               STAGE_HIGH_INT_EN               STAGE_COMPLETE_INT_EN
 { /*STAGE0*/  AD7142_STAGEX_COMPLETE_DISABLE, AD7142_STAGEX_COMPLETE_DISABLE, AD7142_STAGEX_COMPLETE_DISABLE},
 { /*STAGE1*/  AD7142_STAGEX_COMPLETE_DISABLE, AD7142_STAGEX_COMPLETE_DISABLE, AD7142_STAGEX_COMPLETE_DISABLE},
 { /*STAGE2*/  AD7142_STAGEX_COMPLETE_DISABLE, AD7142_STAGEX_COMPLETE_DISABLE, AD7142_STAGEX_COMPLETE_DISABLE},
