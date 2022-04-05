@@ -34,6 +34,7 @@ bool AD7142::init() {
     bool ret = true;
     // Settings in comment are already true by default, included here to indicate the default settings.
     // Arguments are declared in settings.h and start with an underscore.
+	
     ret &= setPwrControl(_pwrCtrl);
     ret &= setInterrupt(_interruptCtrl);
     ret &= setConnectionSetup(_setupCin0_6, _setupCin7_13);
@@ -97,7 +98,7 @@ bool AD7142::setSequenceStageNum(uint8_t num) {
   }
   _numStages = num;
   uint16_t pwr_control_reg = readRegister(AD7142_PWR_CONTROL);
-  pwr_control_reg = (pwr_control_reg & 0b1111111100001111) | (num<<4);
+  pwr_control_reg = (pwr_control_reg & 0b1111111100001111) | ( (num - 1) << 4);
   return writeRegister(AD7142_PWR_CONTROL, pwr_control_reg);
 }
 
@@ -171,7 +172,7 @@ bool AD7142::setInterrupt(uint8_t interruptCtrl[12][3]) {
   uint16_t lowIntReg = 0;
   uint16_t highIntReg = 0;
   uint16_t completeIntReg = 0;
-  for( int stage = 0 ; stage < 3 ; stage++ ) {
+  for( int stage = 0 ; stage < 12 ; stage++ ) {
     lowIntReg       += interruptCtrl[stage][0] << stage;
     highIntReg      += interruptCtrl[stage][1] << stage;
     completeIntReg  += interruptCtrl[stage][2] << stage;
@@ -181,6 +182,11 @@ bool AD7142::setInterrupt(uint8_t interruptCtrl[12][3]) {
   ret &= writeRegister(AD7142_STAGE_HIGH_INT_EN, highIntReg);
   ret &= writeRegister(AD7142_STAGE_COMPLETE_INT_EN, completeIntReg);
   return ret;
+}
+
+bool AD7142::isStageComplete(uint8_t stage) {
+	uint16_t stage_complete_reg = readRegister(AD7142_STAGE_COMPLETE_LIMIT_INT);
+	return stage_complete_reg & (1 << stage);
 }
 
 // ************************
@@ -263,7 +269,7 @@ void AD7142::formatResults() {
 
 void AD7142::printResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
-    AD7142_LOG_ANY(String("Stage ") + String(stage) + String(": ") + String(_resultsRaw[stage]) + String(" / ") + String(_resultsPf[stage]) + String("pF"));
+    AD7142_LOG_INFO(String("Stage ") + String(stage) + String(": ") + String(_resultsRaw[stage]) + String(" / ") + String(_resultsPf[stage]) + String("pF") + String("\n"));
   }
 }
 

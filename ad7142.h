@@ -16,8 +16,9 @@
 // set the profile (AD7142_PROFILE) to determine which settings are used from settings.h
 #define AD7142_PROFILE_5X5                0
 #define AD7142_PROFILE_SINGLE             1
-#define AD7142_PROFILE_DEBUG              2
-#define AD7142_PROFILE                    AD7142_PROFILE_DEBUG 
+#define AD7142_PROFILE_DEBUG_PROCH        2
+#define AD7142_PROFILE_DEBUG_BEMIS        3
+#define AD7142_PROFILE                    AD7142_PROFILE_5X5 
 
 // ***********
 //  Registers
@@ -198,7 +199,7 @@
 
 // STAGE_COMPLETE_INT_EN bit options, datasheet Table 27
 #define AD7142_STAGEX_COMPLETE_DISABLE    0x00
-#define AD7142_STAGEX_COMPLETE_ENABLE     0x01 // INT asserted at completion of STAGE0 conversion
+#define AD7142_STAGEX_COMPLETE_ENABLE     0x01 // INT asserted at completion of STAGEX conversion
 
 #define AD7142_GPIO_INT_ENABLE            0x00
 #define AD7142_GPIO_INT_DISABLE           0x01
@@ -277,6 +278,7 @@ class AD7142 {
 
     // Interrupt control
     bool setInterrupt(uint8_t interruptCtrl[12][3]);
+	bool isStageComplete(uint8_t stage);
     
     // CIN connection setup
     bool setConnectionSetup(uint8_t cin0_6[12][7], uint8_t cin7_13[12][7]);
@@ -294,21 +296,22 @@ class AD7142 {
     void printResults();
 
     uint16_t readRegister(const uint16_t register_addr);
+    bool writeRegister(const uint16_t register_addr, const uint16_t value);
+	
  private:
     uint8_t _address;  // I2C address
     uint16_t* _resultsRaw;
     float* _resultsPf;
     uint8_t _numStages; // number of conversion stages
 
-    bool writeRegister(const uint16_t register_addr, const uint16_t value);
     bool writeRegisterBits(const uint16_t register_addr, uint16_t start_bit, uint16_t end_bit, const uint16_t value);
     
     bool checkTransmissionResult(byte result);
 };
 
 
-// Logger wrapper
-#define AD7142_LOG_LEVEL 5
+// Logger wrapper, set to 0 to prevent any serial printing
+#define AD7142_LOG_LEVEL 4
 
 #if AD7142_LOG_LEVEL >= 5
 #define AD7142_LOG_DEBUG(x) Serial.println(String("DEBUG: ") + String(x))
