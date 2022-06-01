@@ -21,13 +21,13 @@ AD7142::AD7142( uint8_t add0, uint8_t add1 ) {
   } else {
     _address = AD7142_I2C_BASE_ADDRESS + (add1<<1) + add0;
   }
-  _resultsRaw = new uint16_t[12];  // raw results register contents
-  _resultsPf = new float[12];      // results in pF
 }
-AD7142::~AD7142() {
+
+/*AD7142::~AD7142() {
   delete[] _resultsRaw;
   delete[] _resultsPf;
-}
+}*/
+
 bool AD7142::init() {
   Wire.begin(); 
   if ( checkDeviceId() ) {
@@ -233,6 +233,7 @@ bool AD7142::enableAfeOffsets(uint8_t afeOffsetDisable[12][2]) {
 }*/
 
 bool AD7142::setAfeOffsets(uint8_t offsets[12][4]) {
+	// Entirely writes all 12 STAGEX_AFE_OFFSET registers
   bool ret = true;
   for( int stage = 0 ; stage < 12 ; stage++ ) {
     uint16_t val = 
@@ -248,12 +249,43 @@ bool AD7142::setAfeOffsets(uint8_t offsets[12][4]) {
   return ret;
 }
 
+bool AD7142::setPosAfeOffsets(uint8_t offsets[12]) {
+  bool ret = true;
+  for( int stage = 0 ; stage < 12 ; stage++ ) {
+    ret &= writeRegisterBits(
+      AD7142_STAGE0_AFE_OFFSET + stage*AD7142_STAGEX_BANK2_ADDR_OFFSET,
+	  8, 14,
+      offsets[stage]
+      );
+  }
+  return ret;
+}
+
+bool AD7142::setNegAfeOffsets(uint8_t offsets[12]) {
+  bool ret = true;
+  for( int stage = 0 ; stage < 12 ; stage++ ) {
+    ret &= writeRegisterBits(
+      AD7142_STAGE0_AFE_OFFSET + stage*AD7142_STAGEX_BANK2_ADDR_OFFSET,
+	  0, 6,
+      offsets[stage]
+      );
+  }
+  return ret;
+}
+
+// *****************************
+//    Getters/Setters
+// *****************************
+
+	// Directly implemented in ad7142.h
+
 // *****************************
 //    Actual functionality
 // *****************************
 
 void AD7142::readResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
+	  // TODO: dedicated function that reads all conv data registers using only one I2C query (req 24 bytes starting ADC_RESULT_S0)
     _resultsRaw[stage] = readRegister(AD7142_STAGE0_CONV_DATA + stage*AD7142_STAGEX_BANK3_ADDR_OFFSET);
   }
   formatResults();
@@ -298,7 +330,14 @@ bool AD7142::writeRegisterBits(const uint16_t register_addr, uint16_t start_bit,
     AD7142_LOG_ERROR("Invalid bit range passed to writeRegisterBits.");
     return false;
   } else if ( val >= pow(2, end_bit - start_bit + 1) ) {
-    AD7142_LOG_ERROR("Value too large for passed bit range.");
+    AD7142_LOG_ERROR(
+		String("Value ") 
+		+ String(val)
+		+ String(" too large for passed bit range ")
+		+ String(start_bit)
+		+ String("-")
+		+ String(end_bit)
+		);
     return false;
   }
   uint16_t reg_content = readRegister(register_addr);

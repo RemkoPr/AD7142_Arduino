@@ -16,9 +16,11 @@
 // set the profile (AD7142_PROFILE) to determine which settings are used from settings.h
 #define AD7142_PROFILE_5X5                0
 #define AD7142_PROFILE_SINGLE             1
-#define AD7142_PROFILE_DEBUG_PROCH        2
-#define AD7142_PROFILE_DEBUG_BEMIS        3
-#define AD7142_PROFILE                    AD7142_PROFILE_5X5 
+#define AD7142_PROFILE_COMBO              2
+#define AD7142_PROFILE_5X5_PROCH          4
+#define AD7142_PROFILE_5X5_DIFF           5
+#define AD7142_PROFILE_FINGER             6
+#define AD7142_PROFILE                    2
 
 // ***********
 //  Registers
@@ -256,7 +258,7 @@ class AD7142 {
  public:
 
     AD7142(uint8_t add0, uint8_t add1); 
-    ~AD7142(); 
+    //~AD7142(); 
 
     bool init(void);                                    
     bool checkDeviceId(void);
@@ -284,6 +286,8 @@ class AD7142 {
     bool setConnectionSetup(uint8_t cin0_6[12][7], uint8_t cin7_13[12][7]);
     bool enableAfeOffsets(uint8_t afeOffsetDisable[12][2]);
     bool setAfeOffsets(uint8_t offsets[12][4]);
+    bool setPosAfeOffsets(uint8_t offsets[12]);
+    bool setNegAfeOffsets(uint8_t offsets[12]);
 
     // Getters & setters
     uint16_t* getResultsRaw() { return _resultsRaw; } 
@@ -300,8 +304,8 @@ class AD7142 {
 	
  private:
     uint8_t _address;  // I2C address
-    uint16_t* _resultsRaw;
-    float* _resultsPf;
+    uint16_t _resultsRaw[12] = { 0 };  // raw results register contents
+    float _resultsPf[12] = { 0 };  // results in pF
     uint8_t _numStages; // number of conversion stages
 
     bool writeRegisterBits(const uint16_t register_addr, uint16_t start_bit, uint16_t end_bit, const uint16_t value);
