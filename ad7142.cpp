@@ -284,12 +284,34 @@ bool AD7142::setNegAfeOffsets(uint8_t offsets[12]) {
 // *****************************
 
 void AD7142::readResults() {
+  AD7142_LOG_DEBUG(String("Attempting to read all results at once"));
+  
+  Wire.beginTransmission(_address); //open communication with 
+  Wire.write(highByte(AD7142_ADC_RESULT_S0));  
+  Wire.write(lowByte(AD7142_ADC_RESULT_S0));
+  byte result = Wire.endTransmission(); 
+  checkTransmissionResult(result);
+
+  Wire.requestFrom(_address, 2*_numStages); // 16-bit registers
+  byte buf[2*_numStages];
+  Wire.readBytes(buf, 2*_numStages);
+  
+  for( int stage = 0 ; stage < _numStages ; stage++ ) {
+	uint8_t valL = buf[2*stage + 1];
+	uint8_t valH = buf[2*stage];
+    _resultsRaw[stage] = (valH << 8) | valL;
+  }
+  formatResults();
+}
+
+/*
+void AD7142::readResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
 	  // TODO: dedicated function that reads all conv data registers using only one I2C query (req 24 bytes starting ADC_RESULT_S0)
     _resultsRaw[stage] = readRegister(AD7142_STAGE0_CONV_DATA + stage*AD7142_STAGEX_BANK3_ADDR_OFFSET);
   }
   formatResults();
-}
+}*/
 
 void AD7142::formatResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
