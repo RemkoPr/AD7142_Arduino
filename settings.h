@@ -585,11 +585,11 @@ uint8_t _afeOffsetDisable[12][2] =
 uint8_t _afeOffset[12][4] = 
     { //      neg offset                                pos offset
       //      		      neg swap                      	        pos swap
-{ /*STAGE0*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 5,          AD7142_AFE_OFFSET_SWAP_FALSE  },
+{ /*STAGE0*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 6,          AD7142_AFE_OFFSET_SWAP_FALSE  },
 { /*STAGE1*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 3,          AD7142_AFE_OFFSET_SWAP_FALSE  },
 { /*STAGE2*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 6,          AD7142_AFE_OFFSET_SWAP_FALSE  },
-{ /*STAGE3*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 5,          AD7142_AFE_OFFSET_SWAP_FALSE  },
-{ /*STAGE4*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 7,          AD7142_AFE_OFFSET_SWAP_FALSE  },
+{ /*STAGE3*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 6,          AD7142_AFE_OFFSET_SWAP_FALSE  },
+{ /*STAGE4*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 6,          AD7142_AFE_OFFSET_SWAP_FALSE  },
 { /*STAGE5*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 3,          AD7142_AFE_OFFSET_SWAP_FALSE  },
 { /*STAGE6*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 0,          AD7142_AFE_OFFSET_SWAP_FALSE  },
 { /*STAGE7*/  0,          AD7142_AFE_OFFSET_SWAP_FALSE, 0,         AD7142_AFE_OFFSET_SWAP_FALSE  },
