@@ -20,7 +20,7 @@
 #define AD7142_PROFILE_5X5_PROCH          4
 #define AD7142_PROFILE_5X5_DIFF           5
 #define AD7142_PROFILE_FINGER             6
-#define AD7142_PROFILE                    2
+#define AD7142_PROFILE                    6
 
 // ***********
 //  Registers
