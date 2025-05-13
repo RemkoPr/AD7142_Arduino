@@ -13,14 +13,15 @@
 
 #define AD7142_I2C_BASE_ADDRESS           0x02C // 0101 100
 
-// set the profile (AD7142_PROFILE) to determine which settings are used from settings.h
 #define AD7142_PROFILE_5X5                0
 #define AD7142_PROFILE_SINGLE             1
 #define AD7142_PROFILE_COMBO              2
 #define AD7142_PROFILE_5X5_PROCH          4
 #define AD7142_PROFILE_5X5_DIFF           5
 #define AD7142_PROFILE_FINGER             6
-#define AD7142_PROFILE                    6
+#define AD7142_PROFILE_SEAHORSE14         7
+// set the profile (AD7142_PROFILE) to determine which settings are used from settings.h
+#define AD7142_PROFILE                    AD7142_PROFILE_SEAHORSE14
 
 // ***********
 //  Registers
@@ -245,6 +246,9 @@
 #define AD7142_AFE_OFFSET_SWAP_FALSE      0x00
 #define AD7142_AFE_OFFSET_SWAP_TRUE       0x01
 
+#define NUM_CHANNELS 14
+#define AVERAGE_WINDOW 16
+
 // TODO table 49 sensitivity settings
 
 // ***********
@@ -291,13 +295,16 @@ class AD7142 {
 
     // Getters & setters
     uint16_t* getResultsRaw() { return _resultsRaw; } 
-    float* getResultsPf() { return _resultsPf; } 
+    float* getResultsPf() { return _resultsfF; } 
     uint8_t getNumStages() { return _numStages; } 
 
     // Actual functionality
     void readResults();
+    void initResultsOffsets();
     void formatResults();
     void printResults();
+    void plotRawResults();
+    void plotFormattedResults();
 
     uint16_t readRegister(const uint16_t register_addr);
     bool writeRegister(const uint16_t register_addr, const uint16_t value);
@@ -305,7 +312,8 @@ class AD7142 {
  private:
     uint8_t _address;  // I2C address
     uint16_t _resultsRaw[12] = { 0 };  // raw results register contents
-    float _resultsPf[12] = { 0 };  // results in pF
+    uint16_t _resultsOffsets[12] = { 0 };  // raw results register contents
+    float _resultsfF[12] = { 0 };  // results in pF
     uint8_t _numStages; // number of conversion stages
 
     bool writeRegisterBits(const uint16_t register_addr, uint16_t start_bit, uint16_t end_bit, const uint16_t value);
@@ -315,7 +323,7 @@ class AD7142 {
 
 
 // Logger wrapper, set to 0 to prevent any serial printing
-#define AD7142_LOG_LEVEL 4
+#define AD7142_LOG_LEVEL 1
 
 #if AD7142_LOG_LEVEL >= 5
 #define AD7142_LOG_DEBUG(x) Serial.println(String("DEBUG: ") + String(x))

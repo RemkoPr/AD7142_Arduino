@@ -25,7 +25,7 @@ AD7142::AD7142( uint8_t add0, uint8_t add1 ) {
 
 /*AD7142::~AD7142() {
   delete[] _resultsRaw;
-  delete[] _resultsPf;
+  delete[] _resultsfF;
 }*/
 
 bool AD7142::init() {
@@ -304,6 +304,15 @@ void AD7142::readResults() {
   formatResults();
 }
 
+void AD7142::initResultsOffsets() {
+  while(!isStageComplete(_numStages - 1));  // wait
+  readResults();
+  formatResults();
+  for (int i = 0; i < 12; i++) {
+    _resultsOffsets[i] = _resultsRaw[i];
+  }
+}
+
 /*
 void AD7142::readResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
@@ -315,16 +324,30 @@ void AD7142::readResults() {
 
 void AD7142::formatResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
-    uint16_t rawVal = _resultsRaw[stage];
-    float pfVal = rawVal / 2450.0 * 0.16;
-    _resultsPf[stage] = pfVal;
+    float fFVal = _resultsRaw[stage] / 2.45 * 0.16;
+    float offsetVal = _resultsOffsets[stage] / 2.45 * 0.16;
+    _resultsfF[stage] = fFVal - offsetVal;
   }
 }
 
 void AD7142::printResults() {
   for( int stage = 0 ; stage < _numStages ; stage++ ) {
-    AD7142_LOG_INFO(String("Stage ") + String(stage) + String(": ") + String(_resultsRaw[stage]) + String(" / ") + String(_resultsPf[stage]) + String("pF") + String("\n"));
+    AD7142_LOG_INFO(String("Stage ") + String(stage) + String(": ") + String(_resultsRaw[stage]) + String(" / ") + String(_resultsfF[stage]) + String("pF") + String("\n"));
   }
+}
+
+void AD7142::plotRawResults() {
+  for( int stage = 0 ; stage < _numStages ; stage++ ) {
+    AD7142_LOG_ANY(String("Stage_") + String(stage) + String(":") + String(_resultsRaw[stage]) + String(","));
+  }
+  AD7142_LOG_ANY("\n");
+}
+
+void AD7142::plotFormattedResults() {
+  for( int stage = 0 ; stage < _numStages ; stage++ ) {
+    AD7142_LOG_ANY(String("Stage_") + String(stage) + String(":") + String(_resultsfF[stage]) + String(","));
+  }
+  AD7142_LOG_ANY("\n");
 }
 
 // *****************************
